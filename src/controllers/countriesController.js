@@ -11,15 +11,20 @@ function randInt(min, max) {
 }
 
 // ========== POST /countries/refresh ==========
+const countriesResponse = await axios.get('https://restcountries.com/v2/all?fields=name,capital,region,population,flag,currencies');
+const exchangeResponse = await axios.get('https://open.er-api.com/v6/latest/USD');
+
+
 async function refreshAll(req, res) {
   let countriesRaw, rates;
   try {
     [countriesRaw, rates] = await Promise.all([fetchCountries(), fetchExchangeRates()]);
-  } catch (err) {
-    const details = err.message.includes('restcountries')
-      ? 'Could not fetch data from restcountries.com'
-      : 'Could not fetch data from open.er-api.com';
-    return res.status(503).json({ error: 'External data source unavailable', details });
+} catch (err) {
+    console.error('refresh failed', err.message || err);
+    return res.status(503).json({
+      error: "External data source unavailable",
+      details: err.message || "Could not fetch data from external API"
+    });
   }
 
   const now = new Date().toISOString();
