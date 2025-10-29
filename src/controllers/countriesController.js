@@ -14,6 +14,7 @@ function randInt(min, max) {
 async function refreshAll(req, res) {
   let countriesRaw, rates;
   try {
+    req.setTimeout(60000);
     [countriesRaw, rates] = await Promise.all([fetchCountries(), fetchExchangeRates()]);
   } catch (err) {
     const details = err.message.includes('restcountries')
